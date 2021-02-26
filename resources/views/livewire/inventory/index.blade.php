@@ -319,9 +319,9 @@
 								<tr>
 									<td>1</td>
 									<td>
-										@if($inventory->kasi)
-										<h5 class="ui header">{{$inventory->kasi->section ? $inventory->kasi->section->name : '-'}}
-											<div class="sub header">{{$inventory->kasi->name}}</div>
+										@if($trash->kasi)
+										<h5 class="ui header">{{$trash->kasi->section ? $trash->kasi->section->name : '-'}}
+											<div class="sub header">{{$trash->kasi->name}}</div>
 										</h5>
 										@else
 										{{'-'}}
