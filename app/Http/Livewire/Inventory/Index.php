@@ -65,7 +65,7 @@ class Index extends Component
 			return $query->where('name', 'like', '%' . $this->search . '%');
 		})
 		
-		->orderBy('created_at')
+		->orderByDesc('created_at')
 		->paginate(25);
 		$sections = Section::all();
 		$this->emit('selectdropdown');
