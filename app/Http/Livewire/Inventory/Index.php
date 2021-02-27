@@ -93,10 +93,11 @@ class Index extends Component
 		$a = str_replace('-', '', $inventory->obtained_at->toDateString());
 		$b = Invdetail::withTrashed()->where('barcode', 'like', $a . '%')->get()->max();
 		
+		if($b) $bc = substr($b->barcode, -4);
 		for ($i=1; $i <= $this->quantity; $i++) { 
 			Invdetail::create([
 				'inventory_id'	=> $inventory->id,
-				'barcode'	=> $b ? $b->barcode + $i : $a . str_pad($i, 4, '0', STR_PAD_LEFT),
+				'barcode'	=> $b ? $this->barcoding($a, $bc, $i) : $a . str_pad($i, 4, '0', STR_PAD_LEFT),
 				]
 			);
 		}
@@ -144,11 +145,12 @@ class Index extends Component
 			]
 		);
 		$a = str_replace('-', '', $inventory->obtained_at->toDateString());
-		$b = Invdetail::withTrashed()->where('barcode', 'like', '%' . $a . '%')->get()->max();
+		$b = Invdetail::withTrashed()->where('barcode', 'like', $a . '%')->get()->max();
+		if($b) $bc = substr($b->barcode, -4);
 		for ($i=1; $i <= $this->quantity - $old_quantity; $i++) { 
 			Invdetail::create([
 				'inventory_id'	=> $inventory->id,
-				'barcode'	=> $b ? $b->barcode + $i : $a . str_pad($i, 4, '0', STR_PAD_LEFT),
+				'barcode'	=> $b ? $this->barcoding($a, $bc, $i) : $a . str_pad($i, 4, '0', STR_PAD_LEFT),
 				]
 			);
 		}
@@ -185,5 +187,12 @@ class Index extends Component
 		$d = explode('/' , $date);
 		return $d[2] . '-' . $d[1] . '-' . $d[0];
 	}
+	
+	private function barcoding($base, $newval, $increment)
+	{
+	    $add = $newval + $increment;
+	    return $base . str_pad($add, 4, '0', STR_PAD_LEFT);
+	}
+
 	
 }

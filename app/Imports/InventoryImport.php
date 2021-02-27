@@ -37,19 +37,27 @@ class InventoryData implements ToModel, WithStartRow
 		);
 		$a = str_replace('-', '', $inventory->obtained_at->toDateString());
 		$b = Invdetail::withTrashed()->where('barcode', 'like', $a . '%')->get()->max();
-		// $b = Invdetail::withTrashed()->select("LEFT('barcode', $a)")->get()->max();
+		if($b) $bc = substr($b->barcode, -4);
 		for ($i=1; $i <= $row[6]; $i++) { 
 			Invdetail::create([
 				'inventory_id'	=> $inventory->id,
-				'barcode'	=> $b ? $b->barcode + $i : $a . str_pad($i, 4, '0', STR_PAD_LEFT),
+				'barcode'	=> $b ? $this->barcoding($a, $bc, $i) : $a . str_pad($i, 4, '0', STR_PAD_LEFT),
 				]
 			);
 		}
 		return $inventory;
+	}
+	
+	private function barcoding($base, $newval, $increment)
+	{
+	    $add = $newval + $increment;
+	    return $base . str_pad($add, 4, '0', STR_PAD_LEFT);
 	}
 
 	public function startRow(): int
 	{
 		return 3;
 	}
+	
+
 }
