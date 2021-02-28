@@ -14,9 +14,11 @@
 		@php $i = 0 @endphp
 		<tr>
 			@foreach ($inventory->details as $item)
-			<td style="text-align:center; width:184px!important; border:1px solid black; padding-left:44px; padding-top:20px">
-				{!!DNS2D::getBarcodeHTML(route('inventoryview', $item->barcode), 'QRCODE', 5, 5)!!}
-				<h4 style="padding-left:-44px!important">{{$item->barcode}}</h4>
+			{{-- <td style="text-align:center; width:184px!important; border:1px solid black; padding-left:44px; padding-top:20px"> --}}
+				{{-- {!!DNS2D::getBarcodeHTML(route('inventoryview', $item->barcode), 'QRCODE', 5, 5)!!} --}}
+				<td style="text-align: center; width:184px!important; border:1px solid black; padding-top:50px!important">
+				<?php echo '<img style="margin:0!important; padding:0!important" src="data:image/png;base64,' . DNS2D::getBarcodePNG(route('inventoryview', $item->barcode), 'QRCODE', 5, 5) . '" alt="barcode"   />' ?>
+				<br><b>{{$item->barcode}}</b>
 			</td>
 			@php $i++ @endphp
 			@if($i % 3 == 0)
