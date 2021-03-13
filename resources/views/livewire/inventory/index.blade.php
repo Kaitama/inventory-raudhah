@@ -284,6 +284,19 @@
 					<div class="column">{{ $inventories->links() }}</div>
 				</div>
 			</div>
+
+			@if($search && $inventories->isNotEmpty())
+			<div class="ui segment right aligned">
+				<div class="row">
+					<div class="column">
+						<div class="ui positive labeled icon button" wire:click="exportSearch">
+							<i class="file excel icon"></i>
+							Download Excel
+						</div>
+					</div>
+				</div>
+			</div>
+			@endif
 			
 			<div class="ui segment right aligned">
 				<div class="ui toggle checkbox">

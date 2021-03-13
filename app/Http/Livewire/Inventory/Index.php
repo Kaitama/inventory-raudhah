@@ -9,6 +9,9 @@ use App\Models\Invdetail;
 use App\Models\Section;
 use App\Models\Kasi;
 
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\InventorySearchExport;
+
 use Carbon\Carbon;
 
 class Index extends Component
@@ -112,7 +115,7 @@ class Index extends Component
 		$this->form = true;
 		$this->save = false;
 		$this->idtoedit = $inventory->id;
-		$this->section = $inventory->kasi->section->id;	
+		$this->section = $inventory->kasi ? $inventory->kasi->section->id : null;	
 		$this->getKasi();
 		$this->obtained_at = $inventory->obtained_at->format('d/m/Y');
 		$this->name = $inventory->name;
@@ -178,8 +181,10 @@ class Index extends Component
 	
 	public function getKasi()
 	{
-		$this->kasis = Kasi::where('section_id', $this->section)->get();
-		$this->kasi_id = $this->kasis->first()->id;
+		if($this->section){
+			$this->kasis = Kasi::where('section_id', $this->section)->get();
+			$this->kasi_id = $this->kasis->first()->id;
+		}
 	}
 	
 	private function convertDate($date)
@@ -190,9 +195,27 @@ class Index extends Component
 	
 	private function barcoding($base, $newval, $increment)
 	{
-	    $add = $newval + $increment;
-	    return $base . str_pad($add, 4, '0', STR_PAD_LEFT);
+		$add = $newval + $increment;
+		return $base . str_pad($add, 4, '0', STR_PAD_LEFT);
 	}
 
+	public function exportSearch()
+	{
+		$s = '%' . $this->search . '%';
+		$inventories = Inventory::where('name', 'like', $s)
+		->orWhere('from', 'like', $s)
+		->orWhere('label', 'like', $s)
+		->orWhere('description', 'like', $s)
+		->orWhereHas('kasi', function ($query) {
+			return $query->where('name', 'like', '%' . $this->search . '%');
+		})
+		->orWhereHas('kasi.section', function ($query) {
+			return $query->where('name', 'like', '%' . $this->search . '%');
+		})
+		->orderByDesc('id')
+		->get();
+		return Excel::download(new InventorySearchExport($inventories), 'LAPORAN_INVENTARIS_' . time() . '.xlsx');
+	}
+	
 	
 }
